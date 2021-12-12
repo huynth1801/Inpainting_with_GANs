@@ -158,8 +158,8 @@ class DCGAN(object):
         real_label = 1
         fake_label = 0
 
-        self.writer_real = SummaryWriter(f"logs/real")
-        self.writer_fake = SummaryWriter(f"logs/fake")
+        # self.writer_real = SummaryWriter(f"logs/real")
+        # self.writer_fake = SummaryWriter(f"logs/fake")
 
         dataloader = DataLoader(
             dataset=datasets.ImageFolder(root=self.dataroot,
@@ -284,9 +284,9 @@ class DCGAN(object):
             samples = self.G(sample_z_)
 
         if self.gpu_mode:
-            samples = samples.cpu().data.numpy().transpose(0, 2, 3, 1)
+            samples = samples.cpu().data.numpy().permute(0, 2, 3, 1)
         else:
-            samples = samples.data.numpy().transpose(0, 2, 3, 1)
+            samples = samples.data.numpy().permute(0, 2, 3, 1)
 
         samples = (samples + 1) / 2
         save_images(samples[:image_frame_dim * image_frame_dim, :, :, :], [image_frame_dim, image_frame_dim],
