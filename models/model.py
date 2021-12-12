@@ -11,14 +11,14 @@ from torchvision.utils import make_grid
 import numpy as np
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
-from .generator import Generator
-from .discriminator import Discriminator
+from generator import Generator
+from discriminator import Discriminator
 from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 from tqdm import tqdm
-from utils.utils import plot__multi_loss, save_images, read_mask
-from utils.preprocess_data import poisson_edit
+from utils import *
+from preprocess_data import poisson_edit
 
 
 # custom weights initialization called on netG and netD
@@ -184,7 +184,7 @@ class DCGAN(object):
                 # Format batch
                 real_cpu = data[0].to(self.device)
                 b_size = real_cpu.size(0)
-                label = torch.full((b_size,), real_label, device=self.device)
+                label = torch.full((b_size,), real_label, device=self.device, dtype=torch.float)
                 # Forward pass real batch through D
                 # print(self.D(real_cpu).size())
                 output = self.D(real_cpu).view(-1)
