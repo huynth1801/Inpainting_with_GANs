@@ -17,7 +17,7 @@ from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 from tqdm import tqdm
-from utils import *
+from utils import plot_multi_loss, save_images, imsave, merge, read_mask
 from preprocess_data import poisson_edit
 
 
@@ -251,7 +251,7 @@ class DCGAN(object):
             self.visualize_results(epoch, fix=True)  
             # loss_plot(self.history)
             try:
-                plot__multi_loss(self.model_dir)
+                plot_multi_loss(self.model_dir)
             except Exception:
                 pass
 

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pickle as pkl
 
 
-def plot__multi_loss(model_dir):
+def plot_multi_loss(model_dir):
     import glob
     hist_pkls = glob.glob(os.path.join(model_dir, "history_*.pkl"))
     y1 = []
