@@ -11,14 +11,14 @@ from torchvision.utils import make_grid
 import numpy as np
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
-from generator import Generator
-from discriminator import Discriminator
+from models.generator import Generator
+from models.discriminator import Discriminator
 from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 from tqdm import tqdm
-from utils import plot_multi_loss, save_images, imsave, merge, read_mask
-from preprocess_data import poisson_edit
+from models.utils import plot_multi_loss, save_images, imsave, merge, read_mask
+from models.preprocess_data import poisson_edit
 
 
 # custom weights initialization called on netG and netD
