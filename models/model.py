@@ -353,17 +353,18 @@ class DCGAN(object):
 
                 if iteration % 5000 == 0:
                     # Save results
-                    print("\nsaving impainted images for iteration:{}".format(iteration))
+                    print("\nSaving impainted images for iteration:{}".format(iteration))
                     save_path = os.path.join(inpainted_img_dir, os.path.splitext(image)[0]+"_iteration_{}.png".format(iteration))
                     self.save_image(batch_images_g, target, mask, save_path)
                     loss_context = torch.norm(
                         (masked_batch_images - batch_images_g_masked), p=1)
                     dis_output = self.D(impainting_images)
-                    batch_labels = torch.full((1,), 1, device=self.device)
+                    dis_output.flatten()
+                    batch_labels = torch.full((1,), 1, device=self.device, dtype=torch.float)
                     loss_perceptual = criteria(dis_output, batch_labels)
 
                     total_loss = loss_context + cfgs.lamd * loss_perceptual
-                    print("iteration : {:4} , context_loss:{:.4f},percptual_loss:{:4f}".format(iteration,
+                    print("Iteration : {:4}\tContext_loss:{:.4f}\tPercptual_loss:{:4f}".format(iteration,
                                                                                                  loss_context,
                                                                                                  loss_perceptual))
                     total_loss.backward()
