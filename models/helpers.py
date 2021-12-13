@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import scipy.sparse
+import scipy.misc
 from scipy.sparse.linalg import spsolve
 
 
@@ -95,3 +96,22 @@ def poisson_edit(source, mask, target):
     offset = (0, 0)
     result = poisson_core(source, target, mask, offset)
     return result
+
+def center_crop(x, crop_h, crop_w=None, resize_w=96):
+    if crop_w is None:
+        crop_w = crop_h
+    h, w = x.shape[:2]
+    j = int(round((h - crop_h)/2.))
+    i = int(round((w - crop_w)/2.))
+    return scipy.misc.imresize(x[j:j+crop_h, i:i+crop_w], [resize_w, resize_w])
+
+def transform(image, npx=96, is_crop=True):
+    # npx : # of pixels width/height of image
+    if is_crop:
+        cropped_image = center_crop(image, npx)
+    else:
+        cropped_image = image
+    return np.array(cropped_image)/127.5 - 1.
+
+def inverse_transform(images):
+    return (images+1.)/2.

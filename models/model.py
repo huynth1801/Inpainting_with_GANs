@@ -18,7 +18,7 @@ from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 from tqdm import tqdm
 from models.utils import plot_multi_loss, save_images, imsave, merge, read_mask
-from models.preprocess_data import poisson_edit
+from models.helpers import poisson_edit
 
 
 # custom weights initialization called on netG and netD
