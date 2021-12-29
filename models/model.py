@@ -17,8 +17,12 @@ from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 from tqdm import tqdm
-from models.utils import plot_multi_loss, save_images, imsave, merge, read_mask
-from models.helpers import poisson_edit
+from .utils import *
+from .helpers import *
+from torch.utils.data import DataLoader
+from torch.autograd import Variable
+from datasets import InpaintingImageDataset
+
 
 
 # custom weights initialization called on netG and netD
@@ -37,7 +41,7 @@ def pil_loader(path):
 
 class DCGAN(object):
     def __init__(self, nz, ngf, ndf, nc, batch_size, epochs, lrG, lrD, beta1, beta2, image_size, data_root, \
-                output_dir, dataset, model_name, gpu_mode):
+                output_dir, dataset, model_name, gpu_mode, args):
         """[summary]
 
         Args:
@@ -56,31 +60,31 @@ class DCGAN(object):
             dataset ([string]): [datasetname]
             model_name ([string]): [default: DCGAN]
         """
-        self.nz = nz
-        self.ngf = ngf
-        self.ndf = ndf
-        self.nc = nc
-        self.batch_size = batch_size
-        self.epochs = epochs
-        self.lrG = lrG
-        self.lrD = lrD
-        self.beta1 = beta1
-        self.beta2 = beta2
-        self.image_size = image_size
-        self.dataroot = data_root
-        self.output_dir = output_dir
+        self.nz = args.nz
+        self.ngf = args.ngf
+        self.ndf = args.ndf
+        self.nc = args.nc
+        self.batch_size = args.batch_size
+        self.epochs = args.epochs
+        self.lrG = args.lrG
+        self.lrD = args.lrD
+        self.beta1 = args.beta1
+        self.beta2 = args.beta2
+        self.image_size = args.image_size
+        self.dataroot = args.data_root
+        self.output_dir = args.output_dir
         self.G = Generator(self.nz, self.ngf, self.nc)
         self.D = Discriminator(self.nc, self.ndf)
         
-        self.gpu_mode = gpu_mode
+        self.gpu_mode = args.gpu_mode
         if torch.cuda.is_available() and self.gpu_mode:
             self.device = torch.device("cuda:0")
             torch.backends.cudnn.benchmark = True
         else:
             self.device = torch.device("cpu")
         
-        self.dataset = dataset
-        self.model_name = model_name
+        self.dataset = args.dataset
+        self.model_name = args.model_name
         self.model_dir = os.path.join(self.output_dir, self.dataset, self.model_name)
         self.result_dir = os.path.join(self.output_dir, self.dataset, self.model_name, "results")
         if not os.path.exists(self.model_dir):
@@ -321,8 +325,9 @@ class DCGAN(object):
         mask_dir = cfgs.test_mask_dir
         # Inpainted image and mask that correspond
         images = os.listdir(image_dir)
+        masks = os.listdir(mask_dir)
         aligned_img = [os.path.join(image_dir, image) for image in images]
-        mask_images = [os.path.join(mask_dir, os.path.splitext(image)[0] + '.png') for image in images] 
+        mask_images = [os.path.join(mask_dir, os.path.splitext(image)[0] + '.png') for image in masks] 
 
         for i, image in enumerate(images):
             # target was edited by Poission
@@ -381,3 +386,18 @@ class DCGAN(object):
                     v_hat = v/(1-0.999**(iteration+1))
                     z_hat.data.sub_(m_hat/(torch.sqrt(v_hat)+1e-8))
                     z_hat.data = torch.clamp(z_hat.data, min=-1.0,max=1.0).to(self.device)
+
+    # def inpainting(self):
+    #     # Dataloader
+    #     transforms_ = [
+    #         transforms.Resize((self.img_size, self.img_size)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+
+    #     train_dataloader = DataLoader(
+    #             InpaintingImageDataset(self.dataroot, transforms_=transforms_),
+    #             batch_size=self.batch_size,
+    #             shuffle=True,
+    #             num_workers=2
+    #             )
+        

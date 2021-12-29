@@ -22,8 +22,10 @@ def arg_parse():
     parser.add_argument("--test_image_dir", default='', required=False, type=str, help="test image dir")
     parser.add_argument("--test_mask_dir", default='', required=False, type=str, help="test mask dir")
     parser.add_argument("--lamd", default=0.1, type=float, help="lamd")
+    parser.add_argument("--prior_weight", type=float, default=0.003, help="lambda of prior loss")
     parser.add_argument("--lr", default=0.01, type=float, help="learning rate")
     parser.add_argument("--num_iters", default=40000, type=int, help="num iters")
+    parser.add_argument("--blending_steps", type=int, default=1500, help="blending_steps of training")
 
     args = parser.parse_args()
     return args
